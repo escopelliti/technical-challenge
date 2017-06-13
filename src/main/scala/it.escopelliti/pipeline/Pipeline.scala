@@ -17,8 +17,8 @@ trait Pipeline extends Serializable {
     left
       .leftOuterJoin(right) // we do not know beforehand if there will be stats for that month
       .mapValues { case (prevOutput, valueOpt) =>
-        updateOutput(prevOutput, valueOpt, month)
-      }
+      updateOutput(prevOutput, valueOpt, month)
+    }
   }
 
 }
@@ -36,7 +36,7 @@ abstract class BasePipeline[K: ClassTag, V: ClassTag, T: ClassTag, W: ClassTag](
   protected def build(input: RDD[(K, V)], data: RDD[(K, T)], date: Date): RDD[(K, V)] = {
 
     Month.values().foldLeft(input) {
-      case(acc, month) =>
+      case (acc, month) =>
         baseEnrichOutput[K, V, W](acc)(transform(data, month, date), month, updateOutput)
     }
   }

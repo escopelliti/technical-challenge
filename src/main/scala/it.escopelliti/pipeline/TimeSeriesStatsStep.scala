@@ -11,7 +11,7 @@ object TimeSeriesStatsStep {
   def apply: TimeSeriesStatsStep = new TimeSeriesStatsStep()
 }
 
-class TimeSeriesStatsStep() extends BasePipeline[String, Output, CrossSale, Stats]{
+class TimeSeriesStatsStep() extends BasePipeline[String, Output, CrossSale, Stats] {
 
   def transform(data: RDD[(String, CrossSale)], month: Month, runDate: Date): RDD[(String, Stats)] = {
 

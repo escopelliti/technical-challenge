@@ -11,8 +11,8 @@ object DataLayer {
   //it can be even tables. It does not matter. We put here a string as argument for convenience
   def read[V: ClassTag](path: String)(implicit sc: SparkContext) = {
     //read TBD
-    //Please not consider this line.
-    // For now we retrieve only fake RDD just to compile even if it does not make sense.
+    //Please not consider this line:
+    //  for now we retrieve only fake RDD just to compile even if it does not make sense.
     sc.parallelize[V](Seq[V]())
   }
 
