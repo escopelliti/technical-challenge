@@ -1,5 +1,5 @@
 
-group = 'com.escopelliti'
+group = 'it.escopelliti'
 
 apply plugin: 'application'
 apply plugin: "scala"
