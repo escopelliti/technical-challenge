@@ -48,8 +48,10 @@ object DataValues {
       std.evaluate(list.map(_.toDouble).toArray, avg)
     }
 
+    def emptyStats(month: Month) = new Stats(month, 0, 0, 0, 0, 0, 0, Set.empty[String])
+
     private def takeMinMax(list: List[Long]) = {
-      (list.filter(_ <= 0).min, list.max)
+      (list.filterNot(_ <= 0).min, list.max)
     }
 
     // you can do better than this

@@ -30,7 +30,7 @@ class TimeSeriesStatsStep() extends BasePipeline[String, Output, CrossSale, Stat
       case Some(stats) =>
         previousOutput.timeSeries.months + (month.getValue() -> stats)
       case None =>
-        previousOutput.timeSeries.months + (month.getValue() -> Stats(month)(List.empty[CrossSale]))
+        previousOutput.timeSeries.months + (month.getValue() -> Stats.emptyStats(month))
     }
     previousOutput.copy(timeSeries = TimeSeries(newTimeSeries))
   }
