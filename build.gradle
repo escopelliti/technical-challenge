@@ -1,0 +1,27 @@
+
+group = 'com.escopelliti'
+
+apply plugin: 'application'
+apply plugin: "scala"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "https://dl.bintray.com/websudos/oss-releases/"}
+    maven { url "http://packages.confluent.io/maven/"}
+}
+
+mainClassName=""
+
+dependencies {
+
+    def scalaVersion = '2.11'
+    def sparkVersion = '1.6.2'
+
+    compile group: 'org.apache.spark', name: 'spark-core_' + scalaVersion, version: sparkVersion
+    compile group: 'org.scala-lang', name: 'scala-library', version: scalaVersion + '.8'
+}
