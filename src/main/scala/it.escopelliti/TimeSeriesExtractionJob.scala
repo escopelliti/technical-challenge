@@ -8,11 +8,11 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
 
-object Main {
+object TimeSeriesExtractionJob {
 
   def main(args: Array[String]) {
 
-    val sparkConf: SparkConf = new SparkConf().setAppName("TechnicalChallenge")
+    val sparkConf: SparkConf = new SparkConf().setAppName("TimeSeriesExtractionJob")
     implicit val sc = new SparkContext(sparkConf)
 
     // We are assuming that trim and cleanings have been performed in the previous job

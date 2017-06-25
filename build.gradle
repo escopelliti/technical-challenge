@@ -1,6 +1,5 @@
 group = 'it.escopelliti'
 
-apply plugin: 'application'
 apply plugin: "scala"
 
 sourceCompatibility = 1.8
@@ -13,8 +12,6 @@ repositories {
     maven { url "https://dl.bintray.com/websudos/oss-releases/" }
     maven { url "http://packages.confluent.io/maven/" }
 }
-
-mainClassName = ""
 
 dependencies {
 
