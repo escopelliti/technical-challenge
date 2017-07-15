@@ -15,7 +15,7 @@ object TimeSeriesExtractionJob extends Logging {
 
     val sparkConf: SparkConf = new SparkConf()
       .setAppName("TimeSeriesExtractionJob")
-      .setMaster("local[*]")
+      .setMaster("local[*]") //only to test locally
     val sc = new SparkContext(sparkConf)
     implicit val sqlContext = new SQLContext(sc)
 

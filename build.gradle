@@ -2,9 +2,6 @@ group = 'it.escopelliti'
 
 apply plugin: "scala"
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
 repositories {
     mavenLocal()
     mavenCentral()
@@ -13,13 +10,20 @@ repositories {
     maven { url "http://packages.confluent.io/maven/" }
 }
 
+configurations {
+    provided
+}
+sourceSets {
+    main { compileClasspath += configurations.provided }
+}
+
 dependencies {
 
-    def scalaVersion = '2.11'
-    def sparkVersion = '1.6.2'
+    def scalaVersion = '2.10'
+    def sparkVersion = '1.6.0'
 
-    compile group: 'org.apache.spark', name: 'spark-core_' + scalaVersion, version: sparkVersion
-    compile group: 'org.apache.spark', name: 'spark-sql_' + scalaVersion, version: sparkVersion
+    provided group: 'org.apache.spark', name: 'spark-core_' + scalaVersion, version: sparkVersion
+    provided group: 'org.apache.spark', name: 'spark-sql_' + scalaVersion, version: sparkVersion
     compile group: 'com.databricks', name: 'spark-csv_' + scalaVersion, version: '1.5.0'
-    compile group: 'org.scala-lang', name: 'scala-library', version: scalaVersion + '.8'
+    compile group: 'org.scala-lang', name: 'scala-library', version: scalaVersion + '.5'
 }
