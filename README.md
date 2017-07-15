@@ -1,6 +1,6 @@
 # TimeSeriesExtractionJob
 
-Draft implementation of a Spark job which performs aggregation and trasformation of input data in order to extract monthly timeseries for both brand and market of interest for manufacturers. It expects to process sales' and product's input data.
+Draft implementation of a Spark job which performs aggregation and transformation of input data in order to extract monthly timeseries for both brand and market of interest for manufacturers. It expects to process sales' and product's input data.
 Some custom implementations have to be done to get one's bearings with your data structures (in the development some assumptions have been done) while the aggregation and enrichment logic remain almost the same even changing the use cases.
 
 ## Getting Started
