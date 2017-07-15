@@ -1,7 +1,6 @@
 package it.escopelliti.pipeline
 
-import java.time.Month
-import java.util.Date
+import java.time.{LocalDate, Month}
 
 import it.escopelliti.domain.DataValues.{CrossSale, Output, Stats, TimeSeries}
 import org.apache.spark.rdd.RDD
@@ -13,7 +12,7 @@ object TimeSeriesStatsStep {
 
 class TimeSeriesStatsStep() extends BasePipeline[String, Output, CrossSale, Stats] {
 
-  def transform(data: RDD[(String, CrossSale)], month: Month, runDate: Date): RDD[(String, Stats)] = {
+  def transform(data: RDD[(String, CrossSale)], month: Month, runDate: LocalDate): RDD[(String, Stats)] = {
 
     data
       .filter {

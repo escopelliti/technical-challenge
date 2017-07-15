@@ -1,30 +1,32 @@
 package it.escopelliti.io
 
 import it.escopelliti.domain.DataValues.{CrossSale, Homologation, ProductItem}
-import it.escopelliti.utils.ConfigurationProvider
-import org.apache.spark.SparkContext
+import it.escopelliti.utils.{ConfigurationProvider, Logging}
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{DataFrame, SQLContext}
 
 import scala.reflect.ClassTag
 
 abstract class InputData[V: ClassTag]() extends Serializable {
 
-  def apply(path: String)(implicit sc: SparkContext): RDD[V] =
-    getInputData(DataLayer.read[V](path))
+  def apply(path: String)(implicit sqlContext: SQLContext): RDD[V] =
+    getInputData(DataLayer.read(path))
 
-  protected def getInputData(data: RDD[V])
-                            (implicit sc: SparkContext): RDD[V]
+  protected def getInputData(data: DataFrame)
+                            (implicit sqlContext: SQLContext): RDD[V]
 
 }
 
 
 object ProductsInputData extends InputData[ProductItem] {
 
-  override protected def getInputData(data: RDD[ProductItem])
-                                     (implicit sc: SparkContext): RDD[ProductItem] = {
+  override protected def getInputData(data: DataFrame)
+                                     (implicit sqlContext: SQLContext): RDD[ProductItem] = {
 
     //Put here some additional filter on data if needed
     data
+      .rdd
+      .map(ProductItem())
   }
 
   def getProductsOfInterest(products: RDD[ProductItem], homologations: RDD[Homologation]) = {
@@ -38,10 +40,12 @@ object ProductsInputData extends InputData[ProductItem] {
 
 object HomologationsInputData extends InputData[Homologation] {
 
-  override protected def getInputData(data: RDD[Homologation])
-                                     (implicit sc: SparkContext): RDD[Homologation] = {
+  override protected def getInputData(data: DataFrame)
+                                     (implicit sqlContext: SQLContext): RDD[Homologation] = {
     val brand: String = ConfigurationProvider.getBrandOfInterest().toLowerCase
     data
+      .rdd
+      .map(Homologation())
       .filter {
         case homologation =>
           homologation.vehicle.brand.toLowerCase == brand
@@ -49,12 +53,14 @@ object HomologationsInputData extends InputData[Homologation] {
   }
 }
 
-object CrossSalesInputData extends InputData[CrossSale] {
+object CrossSalesInputData extends InputData[CrossSale] with Logging {
 
-  override protected def getInputData(data: RDD[CrossSale])
-                                     (implicit sc: SparkContext): RDD[CrossSale] = {
+  override protected def getInputData(data: DataFrame)
+                                     (implicit sqlContext: SQLContext): RDD[CrossSale] = {
     val marketOfInterest: String = ConfigurationProvider.getMarketOfInterest().toLowerCase
     data
+      .rdd
+      .map(CrossSale())
       .filter {
         case sale =>
           sale.nutsCode.toLowerCase.startsWith(marketOfInterest)
@@ -65,7 +71,6 @@ object CrossSalesInputData extends InputData[CrossSale] {
     sales
       .keyBy(_.productCode)
       .join(productsOfInterests.keyBy(_.id))
-      .reduceByKey((a, _) => a)
       .map { case (_, (product, _)) => product }
 
 

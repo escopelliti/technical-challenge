@@ -1,10 +1,10 @@
 package it.escopelliti.domain
 
-import java.time.Month
-import java.util.Date
+import java.time.{LocalDate, Month}
 
-import it.escopelliti.utils.ConfigurationProvider
+import it.escopelliti.utils.{ConfigurationProvider, DataProcessingUtils}
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation
+import org.apache.spark.sql.Row
 
 
 object DataValues {
@@ -13,9 +13,40 @@ object DataValues {
 
   case class Vehicle(group: String, brand: String, model: String, modelCode: String)
 
+  object Vehicle {
+    def apply(str: String) = {
+
+      val vehiclePart = str.trim.split(":")
+      new Vehicle(
+        vehiclePart.head,
+        vehiclePart(1),
+        vehiclePart(2),
+        vehiclePart.last
+      )
+    }
+  }
+
   case class ProductItem(id: String, name: String)
 
+  object ProductItem {
+    def apply()(row: Row) = {
+      new ProductItem(
+        row.getAs[String]("id"),
+        row.getAs[String]("name")
+      )
+    }
+  }
+
   case class Homologation(productCode: String, vehicle: Vehicle)
+
+  object Homologation {
+    def apply()(row: Row) = {
+      new Homologation(
+        row.getAs[String]("productCode"),
+        Vehicle(row.getAs[String]("vehicle"))
+      )
+    }
+  }
 
   object Stats {
 
@@ -30,7 +61,7 @@ object DataValues {
       val (min, max) = takeMinMax(quantities)
       val topSellers = retrieveTopSellers(list, ConfigurationProvider.getTopSellerNum())
 
-      new Stats(month, sum, count, avg, std, min, max, topSellers)
+      new Stats(month.name, sum, count, avg, std, min, max, topSellers)
     }
 
     // Draft implementation for those. Here you can use some library or turn the job to make it using dataframe
@@ -48,7 +79,7 @@ object DataValues {
       std.evaluate(list.map(_.toDouble).toArray, avg)
     }
 
-    def emptyStats(month: Month) = new Stats(month, 0, 0, 0, 0, 0, 0, Set.empty[String])
+    def emptyStats(month: Month) = new Stats(month.name, 0, 0, 0, 0, 0, 0, List.empty[String])
 
     private def takeMinMax(list: List[Long]) = {
       (list.filterNot(_ <= 0).min, list.max)
@@ -68,19 +99,37 @@ object DataValues {
         .reverse
         .map(_._1) // take only sellerID
         .take(num)
-        .toSet
+        .distinct
     }
   }
 
-  case class Stats(month: Month, totalSales: Long, transactionsCount: Long, averageSales: Double, std: Double,
-                   minSale: Long, maxSale: Long, topSellers: Set[String])
+  case class Stats(month: String, totalSales: Long, transactionsCount: Long, averageSales: Double, std: Double,
+                   minSale: Long, maxSale: Long, topSellers: List[String] = List.empty[String])
 
-  case class CrossSale(date: Date, productCode: String, sellerName: String, sellerTown: String,
+  case class CrossSale(date: LocalDate, productCode: String, sellerName: String, sellerTown: String,
                        sellerID: String, // built in the first job
                        country: String, nutsCode: String, quantity: Long, pricePerUnit: Double)
 
+  object CrossSale {
+
+    def apply()(row: Row) = {
+
+      new CrossSale(
+        DataProcessingUtils.parseDate(row.getAs[String]("date")),
+        row.getAs[String]("productCode"),
+        row.getAs[String]("sellerName"),
+        row.getAs[String]("sellerTown"),
+        row.getAs[String]("sellerID"),
+        row.getAs[String]("country"),
+        row.getAs[String]("nutsCode"),
+        row.getAs[String]("quantity").toLong,
+        row.getAs[String]("pricePerUnit").toDouble
+      )
+    }
+  }
+
   case class TimeSeries(months: TreeMap[Int, Stats] = TreeMap.empty[Int, Stats])
 
-  case class Output(product: Product, timeSeries: TimeSeries)
+  case class Output(product: ProductItem, timeSeries: TimeSeries)
 
 }

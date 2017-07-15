@@ -19,5 +19,7 @@ dependencies {
     def sparkVersion = '1.6.2'
 
     compile group: 'org.apache.spark', name: 'spark-core_' + scalaVersion, version: sparkVersion
+    compile group: 'org.apache.spark', name: 'spark-sql_' + scalaVersion, version: sparkVersion
+    compile group: 'com.databricks', name: 'spark-csv_' + scalaVersion, version: '1.5.0'
     compile group: 'org.scala-lang', name: 'scala-library', version: scalaVersion + '.8'
 }

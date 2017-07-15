@@ -1,7 +1,6 @@
 package it.escopelliti.pipeline
 
-import java.time.Month
-import java.util.Date
+import java.time.{LocalDate, Month}
 
 import it.escopelliti.utils.ConfigurationProvider
 import org.apache.spark.rdd.RDD
@@ -29,11 +28,11 @@ abstract class BasePipeline[K: ClassTag, V: ClassTag, T: ClassTag, W: ClassTag](
     build(input, data, ConfigurationProvider.getRunDate())
   }
 
-  protected def transform(data: RDD[(K, T)], month: Month, runDate: Date): RDD[(K, W)]
+  protected def transform(data: RDD[(K, T)], month: Month, runDate: LocalDate): RDD[(K, W)]
 
   protected def updateOutput(kpiOut: V, valueOpt: Option[W], month: Month): V
 
-  protected def build(input: RDD[(K, V)], data: RDD[(K, T)], date: Date): RDD[(K, V)] = {
+  protected def build(input: RDD[(K, V)], data: RDD[(K, T)], date: LocalDate): RDD[(K, V)] = {
 
     Month.values().foldLeft(input) {
       case (acc, month) =>

@@ -1,23 +1,37 @@
 package it.escopelliti.utils
 
-import java.util.Date
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+import com.typesafe.config.ConfigFactory
+
+import scala.util.{Failure, Success, Try}
 
 
 object ConfigurationProvider {
 
-  def getOutputPath() = "outputPath"
+  val config = ConfigFactory.load()
 
-  def getRunDate(): Date = new Date()
+  val basePath = "timeseries-job"
 
-  def getSalesPath(): String = "salesPath"
+  def getOutputPath() = config.getString(s"$basePath.output-path")
 
-  def getHomologationPath(): String = "homologationPath"
+  def getRunDate(): LocalDate = {
+    Try(DataProcessingUtils.parseDate(config.getString(s"$basePath.run-date"))) match {
+      case Success(s) => s
+      case Failure(f) => LocalDate.now
+    }
+  }
 
-  def getProductsPath(): String = "productPath"
+  def getSalesPath(): String = config.getString(s"$basePath.sales-path")
 
-  def getMarketOfInterest() = "market/geo"
+  def getHomologationPath(): String = config.getString(s"$basePath.homologation-path")
 
-  def getBrandOfInterest() = "brand"
+  def getProductsPath(): String = config.getString(s"$basePath.product-path")
 
-  def getTopSellerNum() = 10
+  def getMarketOfInterest() = config.getString(s"$basePath.market")
+
+  def getBrandOfInterest() = config.getString(s"$basePath.brand")
+
+  def getTopSellerNum() = config.getInt(s"$basePath.sellers")
 }
